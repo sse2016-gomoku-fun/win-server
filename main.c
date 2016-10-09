@@ -126,7 +126,7 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 	}
 	
 	//Âä×Ó 
-	board[row][col] = BLACK;
+	board[row][col] = meFlag;
 	
 	switch (meFlag)
 	{
