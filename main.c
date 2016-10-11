@@ -170,7 +170,7 @@ void initSock()
     struct sockaddr_in sockAddr;
     memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都使用0填充 
     sockAddr.sin_family = PF_INET;  //使用ipv4地址 
-    sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  //绑定IP地址 
+    sockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");  //绑定IP地址 
     sockAddr.sin_port = htons(23333);  //绑定端口 
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
     
