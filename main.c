@@ -21,11 +21,9 @@ SOCKET servSock, blackSock, whiteSock;
  * ¹¤¾ßÀà
  */
  
-BOOL isPort(const char *port)
+BOOL isPort(const int port)
 {
-	int num;
-	num = atoi(port);
-	return (num >= 0 && num <= 65535);
+	return (port >= 0 && port <= 65535);
 }
 
 
