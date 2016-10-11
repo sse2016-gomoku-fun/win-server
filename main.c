@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <winsock2.h>
+#include <string.h>
+
+#define DEFAULT_PORT 23333
 
 #define BOARD_SIZE 19
 #define BLACK      1
@@ -13,6 +16,34 @@ int turn = BLACK;
 int row, col;
 
 SOCKET servSock, blackSock, whiteSock;
+
+/*
+ * 工具类
+ */
+ 
+BOOL isPort(const char *port)
+{
+	int num;
+	num = atoi(port);
+	return (num >= 0 && num <= 65535);
+}
+
+
+char *getIp()
+{
+	PHOSTENT hostinfo;
+	char name[255];
+	char* ip;
+    if(gethostname(name, sizeof(name)) == 0)
+    {
+        if((hostinfo = gethostbyname(name)) != NULL)
+        {
+            ip = inet_ntoa (*(struct in_addr *)*hostinfo->h_addr_list);
+            return ip;
+        }
+    }
+    return NULL;
+} 
 
 void sendTo(SOCKET *sock, const char *message)
 {
@@ -157,7 +188,7 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 	turn = otherFlag;
 }
 
-void initSock()
+void initSock(int port)
 {
     //初始化 DLL
     WSADATA wsaData;
@@ -171,12 +202,21 @@ void initSock()
     memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都使用0填充 
     sockAddr.sin_family = PF_INET;  //使用ipv4地址 
     sockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");  //绑定IP地址 
-    sockAddr.sin_port = htons(23333);  //绑定端口 
+    sockAddr.sin_port = htons(port);  //绑定端口 
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
     
     //进入监听状态 
     listen(servSock, 20);
-    printf("Listening...\n");
+    
+    char *ip = getIp();
+    if (NULL != ip)
+    {
+		printf("Listening on %s:%d\n", ip, port);
+	}
+	else
+	{
+    	printf("Listening...\n");
+    }
     
     int nSize;
     
@@ -224,8 +264,21 @@ void work()
 	}
 }
 
-int main(){
-	initSock();
+int main(int argc, char *argv[]){
+	
+	if (2 == argc)
+	{
+		const char *port = atoi(argv[1]);
+		if (isPort(port))
+			initSock(port);
+		else
+			initSock(DEFAULT_PORT);
+	}
+	else
+	{
+		initSock(DEFAULT_PORT);
+	}
+	
 	work();
 	closeSock();
 	
