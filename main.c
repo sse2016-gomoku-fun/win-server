@@ -186,12 +186,15 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 	turn = otherFlag;
 }
 
-void initSock(int port)
+void startSock()
 {
     //初始化 DLL
     WSADATA wsaData;
     WSAStartup( MAKEWORD(2, 2), &wsaData);
-    
+}
+
+void initSock(int port)
+{
     //创建套接字 
     servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     
@@ -263,6 +266,8 @@ void work()
 }
 
 int main(int argc, char *argv[]){
+	
+	startSock();
 	
 	if (2 == argc)
 	{
