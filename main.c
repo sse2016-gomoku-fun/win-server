@@ -1,14 +1,18 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <string.h>
-
-#define DEFAULT_PORT 23333
+#include <unistd.h>
 
 #define BOARD_SIZE 19
 #define BLACK      1
 #define WHITE      2
 #define WIN_FLAG   6
 
+struct globalArgs_t {
+	int port;
+} globalArgs;
+
+static const char *optString = "p:h";
 
 char board[BOARD_SIZE][BOARD_SIZE] = {0};
 char buffer[MAXBYTE] = {0};
@@ -248,7 +252,7 @@ void closeSock()
     WSACleanup();
 }
 
-void work()
+void loop()
 {   
     while (TRUE)
     {
@@ -265,24 +269,47 @@ void work()
 	}
 }
 
+void display_usage(char *exe)
+{
+	printf("Usage: %s [OPTIONS] \n", exe);
+	printf("  -p port           Server port\n");
+}
+
+void initArgs(int argc, char *argv[])
+{
+	int opt = 0;
+	globalArgs.port = 23333;
+	
+	opt = getopt(argc, argv, optString);
+	while (opt != -1)
+	{
+		switch (opt)
+		{
+			case 'p':
+				globalArgs.port = atoi(optarg);
+				break;
+			case 'h':
+				display_usage(argv[0]);
+				exit(0);
+				break;
+			default:
+				// Illegal!
+				break;
+		}
+		
+		opt = getopt(argc, argv, optString);
+	}
+}
+
 int main(int argc, char *argv[]){
 	
 	startSock();
 	
-	if (2 == argc)
-	{
-		const char *port = atoi(argv[1]);
-		if (isPort(port))
-			initSock(port);
-		else
-			initSock(DEFAULT_PORT);
-	}
-	else
-	{
-		initSock(DEFAULT_PORT);
-	}
+	initArgs(argc, argv);
 	
-	work();
+	initSock(globalArgs.port);
+	
+	loop();
 	closeSock();
 	
     return 0;
