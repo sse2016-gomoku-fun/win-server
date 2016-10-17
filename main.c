@@ -3,16 +3,17 @@
 #include <string.h>
 #include <unistd.h>
 
-#define BOARD_SIZE 19
+#define BOARD_SIZE 15
 #define BLACK      1
 #define WHITE      2
-#define WIN_FLAG   6
+#define WIN_FLAG   5
 
 struct globalArgs_t {
 	int port;
+	char *mapFile;
 } globalArgs;
 
-static const char *optString = "p:h";
+static const char *optString = "p:m:h";
 
 char board[BOARD_SIZE][BOARD_SIZE] = {0};
 char buffer[MAXBYTE] = {0};
@@ -205,6 +206,25 @@ void startSock()
     WSAStartup( MAKEWORD(2, 2), &wsaData);
 }
 
+void initMap()
+{
+	// 初始化棋局 
+	FILE *fp;
+	if ((fp = fopen(globalArgs.mapFile, "r")) == NULL)
+	{
+		printf("Map file [%s] does not exist!\n", globalArgs.mapFile);
+		exit(1);
+	}
+	int x, y;
+	while (fscanf(fp, "%d%d\n", &x, &y) != EOF)
+	{
+		memset(buffer, 0, sizeof(buffer));
+		sprintf(buffer, "PLACE %d %d\n", x, y);
+    	sendTo(&blackSock, buffer);
+    	sendTo(&whiteSock, buffer);
+	}
+}
+
 void initSock(int port)
 {
     //创建套接字 
@@ -246,6 +266,14 @@ void initSock(int port)
     printf("Client Connected\n");
     
     //初始化黑棋
+    sendTo(&blackSock, "START\n");
+	
+	//初始化白棋 
+	sendTo(&whiteSock, "START\n");
+	
+	initMap();
+    
+    //执黑先行 
 	sendTo(&blackSock, "READY\n");
 }
 
@@ -287,6 +315,7 @@ void initArgs(int argc, char *argv[])
 {
 	int opt = 0;
 	globalArgs.port = 23333;
+	globalArgs.mapFile = NULL;
 	
 	opt = getopt(argc, argv, optString);
 	while (opt != -1)
@@ -295,6 +324,9 @@ void initArgs(int argc, char *argv[])
 		{
 			case 'p':
 				globalArgs.port = atoi(optarg);
+				break;
+			case 'm':
+				globalArgs.mapFile = optarg;
 				break;
 			case 'h':
 				display_usage(argv[0]);
@@ -306,6 +338,12 @@ void initArgs(int argc, char *argv[])
 		}
 		
 		opt = getopt(argc, argv, optString);
+	}
+	
+	if (NULL == globalArgs.mapFile || access(globalArgs.mapFile, F_OK ) == -1)
+	{
+		printf("Please specify the valid map file!\n");
+		exit(0);
 	}
 }
 
