@@ -181,6 +181,14 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
     {
     	sendTo(me, "WIN\n");
     	sendTo(other, "LOSE\n");
+    	if (BLACK == meFlag)
+    	{
+    		printf("BLACK win!\n");
+		}
+		else
+		{
+			printf("WHITE win!\n");
+		}
     	return;
 	}
 	
