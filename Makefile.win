@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o
-LINKOBJ  = main.o
+OBJ      = main.o utils.o
+LINKOBJ  = main.o utils.o
 LIBS     = -L"E:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"E:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc "../../Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib/libws2_32.a" -g3
 INCS     = -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"E:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -26,3 +26,6 @@ $(BIN): $(OBJ)
 
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
+
+utils.o: utils.c
+	$(CC) -c utils.c -o utils.o $(CFLAGS)

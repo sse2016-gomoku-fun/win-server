@@ -18,18 +18,18 @@ ExeOutput=
 ObjectOutput=
 LogOutput=
 LogOutputEnabled=0
-OverrideOutput=0
-OverrideOutputName=server
+OverrideOutput=1
+OverrideOutputName=server.exe
 HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
-CommandLine=23333
+CommandLine=-m map.txt
 Folders=
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=1
 CompilerSettings=0000000000000000001000000
-UnitCount=1
+UnitCount=3
 
 [VersionInfo]
 Major=1
@@ -52,6 +52,26 @@ SyncProduct=1
 
 [Unit1]
 FileName=main.c
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit2]
+FileName=utils.h
+CompileCpp=0
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit3]
+FileName=utils.c
 CompileCpp=0
 Folder=
 Compile=1

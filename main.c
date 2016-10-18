@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "utils.h"
+
 #define BOARD_SIZE 15
 #define BLACK      1
 #define WHITE      2
@@ -51,6 +53,7 @@ char *getIp()
 void sendTo(SOCKET *sock, const char *message)
 {
 	send(*sock, message, strlen(message)+sizeof(char), NULL);
+	Sleep(100);
 }
 
 void retry(SOCKET *sock)
