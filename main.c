@@ -5,7 +5,7 @@
 
 #include "utils.h"
 
-#define BOARD_SIZE 15
+#define BOARD_SIZE 20
 #define BLACK      1
 #define WHITE      2
 #define WIN_FLAG   5
