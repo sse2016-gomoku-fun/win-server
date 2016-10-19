@@ -346,7 +346,7 @@ void initArgs(int argc, char *argv[])
 	if (NULL != globalArgs.mapFile && access(globalArgs.mapFile, F_OK ) == -1)
 	{
 		printf("Map file is invalid! The game will start without map.\n");
-		exit(0);
+		globalArgs.mapFile = NULL;
 	}
 }
 
