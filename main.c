@@ -274,7 +274,7 @@ void initSock(int port)
 	//初始化白棋 
 	sendTo(&whiteSock, "START\n");
 	
-	initMap();
+	if (NULL != globalArgs.mapFile) initMap();
     
     //执黑先行 
 	sendTo(&blackSock, "READY\n");
@@ -343,9 +343,9 @@ void initArgs(int argc, char *argv[])
 		opt = getopt(argc, argv, optString);
 	}
 	
-	if (NULL == globalArgs.mapFile || access(globalArgs.mapFile, F_OK ) == -1)
+	if (NULL != globalArgs.mapFile && access(globalArgs.mapFile, F_OK ) == -1)
 	{
-		printf("Please specify the valid map file!\n");
+		printf("Map file is invalid! The game will start without map.\n");
 		exit(0);
 	}
 }
