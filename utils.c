@@ -5,12 +5,12 @@ char socketBuffer[SOCKET_MAX_BYTE];
 
 void initSocketBuffer()
 {
-	memset(socketBuffer, 0, sizeof(socketBuffer));
+    memset(socketBuffer, 0, sizeof(socketBuffer));
 }
 
 void addToSocketBuffer(const char *buffer)
 {
-	strcat(socketBuffer, buffer);
+    strcat(socketBuffer, buffer);
 }
 
 int hasCommand(char divider)
