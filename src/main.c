@@ -311,6 +311,7 @@ void display_usage(char *exe)
 {
     printf("Usage: %s [OPTIONS] \n", exe);
     printf("  -p port           Server port\n");
+    printf("  -m mapfile        Specify map file\n");
 }
 
 void initArgs(int argc, char *argv[])
