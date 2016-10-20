@@ -25,7 +25,7 @@ int row, col;
 SOCKET servSock, blackSock, whiteSock;
 
 /*
- * 工具类
+ * Ip Utils
  */
  
 BOOL isPort(const int port)
@@ -66,7 +66,7 @@ BOOL isWin(int x, int y)
 	int count;
 	int i, j;
 	
-	//判断横着的
+	// Judge row
 	count = 1;
 	i = x - 1;
 	while (i >= 0 && board[x][y] == board[i][y])
@@ -84,7 +84,7 @@ BOOL isWin(int x, int y)
 	
 	if (count >= WIN_FLAG) return TRUE;
 	
-	//计算竖着的
+	// Judge col
 	count = 1;
 	j = y - 1;
 	while (j >= 0 && board[x][y] == board[x][j])
@@ -102,7 +102,7 @@ BOOL isWin(int x, int y)
 	
 	if (count >= WIN_FLAG) return TRUE;
 	
-	//计算左斜着的
+	// Judge left oblique
 	count = 1;
 	i = x - 1;
 	j = y - 1;
@@ -124,7 +124,7 @@ BOOL isWin(int x, int y)
 	
 	if (count >= WIN_FLAG) return TRUE;
 	
-	//计算右斜着的
+	// Judge right oblique
 	count = 1;
 	i = x - 1;
 	j = y + 1;
@@ -155,14 +155,13 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 	recv(*me, buffer, MAXBYTE, NULL);
 	sscanf(buffer, "%d %d\n", &row, &col);
 	
-	//判断落子是否合法 
+	// Judge if legal
 	if (board[row][col] != 0)
 	{
 		retry(me);
 		return;
 	}
 	
-	//落子 
 	board[row][col] = meFlag;
 	
 	switch (meFlag)
@@ -175,12 +174,12 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 			break;
 	}
 	
-	//转发
+	// Forward
 	memset(buffer, 0, sizeof(buffer));
 	sprintf(buffer, "TURN %d %d\n", row, col);
     sendTo(other, buffer);
     
-    //判断输赢
+    // Judge result
     if (isWin(row, col))
     {
     	sendTo(me, "WIN\n");
@@ -196,7 +195,6 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
     	return;
 	}
 	
-	//发送
 	sendTo(other, "READY\n");
 	
 	turn = otherFlag;
@@ -204,14 +202,13 @@ void handle(SOCKET *me, int meFlag, SOCKET *other, int otherFlag)
 
 void startSock()
 {
-    //初始化 DLL
+    // Initial DLL
     WSADATA wsaData;
     WSAStartup( MAKEWORD(2, 2), &wsaData);
 }
 
 void initMap()
 {
-	// 初始化棋局 
 	FILE *fp;
 	if ((fp = fopen(globalArgs.mapFile, "r")) == NULL)
 	{
@@ -225,23 +222,26 @@ void initMap()
 		sprintf(buffer, "PLACE %d %d\n", x, y);
     	sendTo(&blackSock, buffer);
     	sendTo(&whiteSock, buffer);
+    	
+    	if (BLACK == turn) turn = WHITE;
+    	else turn = BLACK;
 	}
 }
 
 void initSock(int port)
 {
-    //创建套接字 
+    // Open socket
     servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     
-    //绑定套接字 
+    // Bind socket
     struct sockaddr_in sockAddr;
-    memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都使用0填充 
-    sockAddr.sin_family = PF_INET;  //使用ipv4地址 
-    sockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");  //绑定IP地址 
-    sockAddr.sin_port = htons(port);  //绑定端口 
+    memset(&sockAddr, 0, sizeof(sockAddr));
+    sockAddr.sin_family = PF_INET;  // Use ipv4 address 
+    sockAddr.sin_addr.s_addr = inet_addr("0.0.0.0");  // Bind to LAN
+    sockAddr.sin_port = htons(port);  // Bind port
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
     
-    //进入监听状态 
+    // Listen
     listen(servSock, 20);
     
     char *ip = getIp();
@@ -256,38 +256,38 @@ void initSock(int port)
     
     int nSize;
     
-    //接收黑棋请求 
+    // Connect to BLACK
     SOCKADDR blackAddr;
     nSize = sizeof(SOCKADDR);
     blackSock = accept(servSock, (SOCKADDR*)&blackAddr, &nSize);
     printf("Client Connected\n");
     
-    //接收白棋请求 
+    // Connect to WHITE
     SOCKADDR whiteAddr;
     nSize = sizeof(SOCKADDR);
     whiteSock = accept(servSock, (SOCKADDR*)&whiteAddr, &nSize);
     printf("Client Connected\n");
     
-    //初始化黑棋
+    // Initial BLACK
     sendTo(&blackSock, "START\n");
 	
-	//初始化白棋 
+	// Initial WHITE
 	sendTo(&whiteSock, "START\n");
 	
 	if (NULL != globalArgs.mapFile) initMap();
     
-    //执黑先行 
-	sendTo(&blackSock, "READY\n");
+    if (BLACK == turn) sendTo(&blackSock, "READY\n");
+    else sendTo(&blackSock, "READY\n");
 }
 
 void closeSock()
 {
-    //关闭套接字 
+    // Close socket
     closesocket(blackSock);
     closesocket(whiteSock);
     closesocket(servSock);
     
-    //终止 DLL 的使用 
+    // Close DLL
     WSACleanup();
 }
 
@@ -295,7 +295,6 @@ void loop()
 {   
     while (TRUE)
     {
-    	// 先接收下在哪里 
     	switch (turn)
     	{
     		case BLACK:
