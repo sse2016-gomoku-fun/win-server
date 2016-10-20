@@ -277,7 +277,7 @@ void initSock(int port)
     if (NULL != globalArgs.mapFile) initMap();
     
     if (BLACK == turn) sendTo(&blackSock, "READY\n");
-    else sendTo(&blackSock, "READY\n");
+    else sendTo(&whiteSock, "READY\n");
 }
 
 void closeSock()
